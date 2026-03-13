@@ -4,19 +4,9 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "definitions.h"
+
 #define MAX_TOKENS 5000
-
-typedef enum
-{
-    PLUS,
-    NUMERIC
-} token_type;
-
-typedef struct
-{
-    token_type type;
-    char *value;
-} Token;
 
 int lexer(char *line)
 {
@@ -29,13 +19,13 @@ int lexer(char *line)
 
         if (current_char == '+')
         {
-            tokens[current_token] = (Token){PLUS};
+            tokens[current_token] = (Token){TOKEN_PLUS};
             current_token++;
         }
 
         if (isdigit(current_char))
         {
-            tokens[current_token] = (Token){NUMERIC};
+            tokens[current_token] = (Token){TOKEN_NUMERIC};
         }
     }
 
