@@ -7,14 +7,26 @@
 
 int sarian(char *code)
 {
-    for (int i = 0; i < strlen(code); i++)
+    int lineNum = 1;
+    char line[8096]; // Make the line size dynamic
+
+    size_t code_len = strlen(code);
+    for (int i = 0; i <= code_len; i++)
     {
-        char line[8096]; // Make the line size dynamic
         char current_char = code[i];
 
         if (current_char == '\n' || current_char == '\0')
         {
-            lexer(line);
+            lexer(line,lineNum);
+
+            if (current_char == '\0')
+            {
+                // Don't increment line size since it's the end of the code, not a new line.
+            }
+            else if (current_char == '\n')
+            {
+                lineNum++;
+            }
 
             line[0] = '\0';
         }

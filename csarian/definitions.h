@@ -1,15 +1,19 @@
 // definitions.h
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
-// Token Types
+// Token types
 typedef enum
 {
     TOKEN_PLUS,
-    TOKEN_NUMERIC
+    TOKEN_EQUAL,
+    TOKEN_NUMERIC,
+    // TOKEN_ASSIGNMENT, This will replace the equal token for assigning variables.
+    TOKEN_IDENTIFIER,
+    TOKEN_STRING
 } TokenType;
 
-// Token
+// Token struct
 typedef struct
 {
     TokenType type;

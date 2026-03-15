@@ -1,6 +1,6 @@
 // sarian.h
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef SARIAN_H
+#define SARIAN_H
 
 int sarian(char *code);
 

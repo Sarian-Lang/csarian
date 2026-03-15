@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "sarian.h"
+#include "error.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +14,7 @@ int main(int argc, char *argv[])
         FILE *file = fopen(argv[1], "r");
         if (!file)
         {
-            perror("Error opening file");
+            perror("[Main] Error opening file");
             return 1;
         }
 
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
         char *code = malloc(filesize + 1);
         if (!code)
         {
-            fprintf(stderr, "Error: insufficient memory\n");
+            fprintf(stderr, "[Main] Error: insufficient memory\n");
             fclose(file);
             return 1;
         }
@@ -35,7 +36,9 @@ int main(int argc, char *argv[])
         fclose(file);
 
         sarian(code);
+        
         free(code);
+        code = NULL;
     }
     else
     {
