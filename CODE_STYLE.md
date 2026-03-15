@@ -6,8 +6,8 @@ This document defines the preferred coding style for the **Sarian programming la
 
 ## 1. Indentation
 
-* Use **tabs** for indentation; do not replace tabs with spaces.
-* Avoid mixed indentation; editors should be configured to insert *tabs only*.
+* Use **tabs** for indentation.
+* Avoid mixed indentation.
 * Do not insert space characters for indentation purposes except for alignment within a single line if necessary.
 
 ---
