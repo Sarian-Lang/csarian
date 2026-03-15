@@ -33,6 +33,7 @@ This will compile the interpreter to `build/sarian`.
 ## Community & Core Development
 
 Join the **Sarian Discord** community: [discord.gg/DWCpW3V6KT](https://discord.gg/DWCpW3V6KT)
+
 If you are interested in **becoming a core developer** of Sarian, you’ll find all relevant information in the Discord server.
 
 Benefits of being a Core Developer:
