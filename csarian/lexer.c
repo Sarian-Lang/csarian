@@ -22,9 +22,6 @@ void printTokens(Token *tokens, int numTokens) {
             case TOKEN_NUMERIC:
                 printf("[TOKEN_NUMERIC (%s)] ",tokens[i].value);
                 break;
-            case TOKEN_ASSIGNMENT:
-                printf("[TOKEN_ASSIGNMENT] ");
-                break;
             case TOKEN_IDENTIFIER:
                 printf("[TOKEN_IDENTIFIER] ");
                 break;
