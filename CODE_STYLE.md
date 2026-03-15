@@ -64,10 +64,10 @@ void function_name()
   * ✅ `TokenType`
   * ✅ `AstNode`
 
-* Enum values should also follow PascalCase:
+* Enums should also follow PascalCase:
 
-  * ✅ `TokenString`
-  * ✅ `TokenNumber`
+  * ✅ `TokenType`
+  * ✅ `NodeValues`
 
 ---
 
