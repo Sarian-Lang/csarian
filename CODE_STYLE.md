@@ -19,7 +19,7 @@ All opening and closing braces `{}` must be placed on **their own lines** as fol
 ```c
 if (condition)
 {
-  // code
+  	// code
 }
 else
 {
@@ -106,10 +106,20 @@ void function_name()
   * ❌ `// Parser.`
 * For full sentences or explanations, use proper **SPaG**: correct spelling, punctuation, and grammar.
 
-  * ✅ `// This is a very, very, very, very, very, very, very
-        // long comment, you can still see this comment
-        // in small screens`
-  * ❌ `// This is a very very very very very very very long comment, this comment is so long that in small screens you can't see past right`
+  * ✅
+    
+    ```c
+    // This is a very, very, very, very, very, very, very
+    // long comment, you can still see this comment
+    // in small screens // This is a very very very very very very very long comment, this comment is so long that in small screens you can't see past right
+    ```
+    
+  * ❌
+
+    ```c
+    // This is a very very very very very very very long comment, this comment is so long that in small screens you can't see past right
+    ```
+    
 * If the comment is long, split it into multiple `//` lines rather than a single long line.
 
 ### 4.4 Best Practices
