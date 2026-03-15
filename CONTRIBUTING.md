@@ -32,7 +32,7 @@ Before contributing, please read these guidelines carefully.
 
 ## 2. Code Style
 
-* Follow the language’s **style guide** [`CODE_STYLE.md`]
+* Follow the language’s **style guide** [CODE_STYLE.md](CODE_STYLE.md)
 * Ensure **readability and maintainability**, future contributors should be able to understand your code easily.
 
 ---
