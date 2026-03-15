@@ -1,4 +1,4 @@
-# Sarian (CSarian) – Version 0.1 (Alpha)
+# Sarian – Version 0.1 (Alpha)
 
 **Sarian** is an interpreted programming language written in C, designed for simplicity and rapid development. Still under active development, so you can expect unfinished code.
 
