@@ -30,7 +30,7 @@ This will compile the interpreter to `build/sarian`.
 
 ---
 
-## Community & Core Development
+## Community
 
 **Sarian Discord** community: [discord.gg/DWCpW3V6KT](https://discord.gg/DWCpW3V6KT)
 
