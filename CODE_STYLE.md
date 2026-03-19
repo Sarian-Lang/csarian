@@ -38,7 +38,7 @@ void function_name()
 
 ### 3.1 Variables
 
-* Must be **fully descriptive**. Abbreviations are not allowed.
+* Must be **fully descriptive**. Abbreviations are not allowed (unless it's very obvious what it means).
 
   * ❌ `int TK;`
   * ✅ `int TOKEN;`
