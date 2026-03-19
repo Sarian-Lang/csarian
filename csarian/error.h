@@ -5,10 +5,17 @@
 // Error types
 typedef enum
 {
-    // Memory errors (MEM):
-    MEM_MALLOC_FAILED,      // malloc() = null (code 0)
-    MEM_CALLOC_FAILED,      // calloc() = null (code 1)
-    MEM_REALLOC_FAILED      // realloc() = null (code 2)
+    // --- Memory errors (MEM): ---
+    MEM_MALLOC_FAILED,
+    MEM_CALLOC_FAILED,
+    MEM_REALLOC_FAILED,
+
+    // --- Syntax errors (SYNTAX): ---
+    SYNTAX_INCOMPLETE_EXPRESSION,
+    SYNTAX_INCOMPLETE_PARENT,
+
+    // --- Token errors (TOKENERR): ---
+    TOKENERR_UNKNOWN_TOKEN
 } ErrorType;
 
 int error(int line, int error_type, char *error_message);

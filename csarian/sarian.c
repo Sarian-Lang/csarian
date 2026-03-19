@@ -1,17 +1,25 @@
 // sarian.c
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "lexer.h"
 #include "definitions.h"
+#include "error.h"
 
 int sarian(char *code)
 {
     int lineNum = 1;
-    char line[8096]; // Make the line size dynamic
 
+    char *line = calloc(1, 1);
+    if (!line)
+    {
+        error(lineNum, 1, "Failed to calloc() line.");
+    }
+
+    // Iterate over the code until we find a new line / code-end character.
     size_t code_len = strlen(code);
-    for (int i = 0; i <= code_len; i++)
+    for (size_t i = 0; i <= code_len; i++)
     {
         char current_char = code[i];
 
@@ -28,17 +36,22 @@ int sarian(char *code)
                 lineNum++;
             }
 
-            line[0] = '\0';
+            line[0] = '\0'; // Clear line array for the next line.
         }
 
         else
         {
             // Add current character to the line.
-            size_t len = strlen(line);
-            if (len < sizeof(line) - 1) {
-                line[len] = current_char;
-                line[len + 1] = '\0';
+            char *tmp = realloc(line, strlen(line) + 1);
+            if (!tmp)
+            {
+                error(lineNum, 2, "Failed to realloc() line.");
             }
+            line = tmp;
+
+            size_t len = strlen(line);
+            line[len] = current_char;
+            line[len + 1] = '\0';
         }
     }
 }

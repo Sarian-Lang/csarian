@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         char *code = malloc(filesize + 1);
         if (!code)
         {
-            fprintf(stderr, "[Main] Error: insufficient memory\n");
+            perror("[Main] Error: insufficient memory\n");
             fclose(file);
             return 1;
         }
