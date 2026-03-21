@@ -1,60 +1,61 @@
-// main.c
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-#include "sarian.h"
-#include "error.h"
+#include "lexer.h"
 
 int main(int argc, char *argv[])
 {
-    if (argc > 1)
+    if (argc < 2)
     {
-        // Read file
-        FILE *file = fopen(argv[1], "r");
-        if (!file)
-        {
-            perror("[Main] Error opening file");
-            return 1;
-        }
+        fprintf(stderr, "Usage: %s <source_file>\n", argv[0]);
+        return 1;
+    }
 
-        fseek(file, 0, SEEK_END);
-        long filesize = ftell(file);
-        fseek(file, 0, SEEK_SET);
+    FILE *file = fopen(argv[1], "rb");
+    if (!file)
+    {
+        perror("[Main] Error opening file");
+        return 1;
+    }
 
-        // Read content
-        char *code = malloc(filesize + 1);
-        if (!code)
-        {
-            perror("[Main] Error: insufficient memory\n");
-            fclose(file);
-            return 1;
-        }
-
-        fread(code, 1, filesize, file);
-        code[filesize] = '\0';
+    if (fseek(file, 0, SEEK_END) != 0)
+    {
+        perror("[Main] Error seeking file end");
         fclose(file);
-
-        sarian(code);
-        
-        free(code);
-        code = NULL;
+        return 1;
     }
-    else
+
+    long filesize = ftell(file);
+    if (filesize < 0)
     {
-        // REPL
-        while (true)
-        {
-            char input[4028];
+        perror("[Main] Error getting file size");
+        fclose(file);
+        return 1;
+    }
+    fseek(file, 0, SEEK_SET);
 
-            printf("->> ");
-
-            fgets(input, 4028, stdin);
-
-            sarian(input);
-            input[0] = '\0';
-        }
+    char *code = malloc((size_t)filesize + 1);
+    if (!code)
+    {
+        perror("[Main] Error: insufficient memory");
+        fclose(file);
+        return 1;
     }
 
+    size_t bytesRead = fread(code, 1, (size_t)filesize, file);
+    if (bytesRead != (size_t)filesize)
+    {
+        perror("[Main] Error reading file completely");
+        free(code);
+        fclose(file);
+        return 1;
+    }
+
+    code[filesize] = '\0';
+    fclose(file);
+
+    Lexer(code);
+
+    free(code);
     return 0;
 }

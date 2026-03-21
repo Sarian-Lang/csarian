@@ -2,6 +2,8 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <stdbool.h>
+
 // Global vars
 typedef struct
 {
@@ -12,23 +14,36 @@ typedef struct
 // Token types
 typedef enum
 {
+    TOKEN_EOF,  // End Of File
+    TOKEN_EOL,  // End Of Line
     TOKEN_PLUS,
     TOKEN_MINUS,
     TOKEN_ASTERISK,
     TOKEN_SLASH,
     TOKEN_PERCENT,
-    TOKEN_INTLITERAL,
-    TOKEN_FLOATLITERAL,
+    TOKEN_INT_LITERAL,
+    TOKEN_FLOAT_LITERAL,
     TOKEN_ASSIGNMENT,
     TOKEN_IDENTIFIER,
     TOKEN_STRING,
-    TOKEN_HASHTAG,
     TOKEN_LPARENT,
     TOKEN_RPARENT,
     TOKEN_IF,
     TOKEN_WHILE,
     TOKEN_FOR,
-    TOKEN_ELSE
+    TOKEN_ELSE,
+    TOKEN_LBRACKET,
+    TOKEN_RBRACKET,
+    TOKEN_EQUAL,
+    TOKEN_NOT_EQUAL,
+    TOKEN_LESS,
+    TOKEN_LESS_EQUAL,
+    TOKEN_GREATER,
+    TOKEN_GREATER_EQUAL,
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_EXCLAMATION,
+    TOKEN_COLON
 } TokenType;
 
 // Precedences
@@ -55,7 +70,7 @@ typedef struct
 #define IS_BINARY_OPERATOR(t) ((t) == TOKEN_PLUS || (t) == TOKEN_MINUS || (t) == TOKEN_ASTERISK || \
                                (t) == TOKEN_SLASH || (t) == TOKEN_PERCENT)
 
-#define IS_VALID_BINARY_OPERAND(t) ((t) == TOKEN_INTLITERAL || (t) == TOKEN_FLOATLITERAL || (t) == TOKEN_STRING || \
+#define IS_VALID_BINARY_OPERAND(t) ((t) == TOKEN_INT_LITERAL || (t) == TOKEN_FLOAT_LITERAL || (t) == TOKEN_STRING || \
                                     (t) == TOKEN_IDENTIFIER)
 
 #endif

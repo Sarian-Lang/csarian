@@ -15,7 +15,13 @@ typedef enum
     SYNTAX_INCOMPLETE_PARENT,
 
     // --- Token errors (TOKENERR): ---
-    TOKENERR_UNKNOWN_TOKEN
+    TOKENERR_UNKNOWN_TOKEN,
+
+    // --- Identifiers errors (IDENTIFIER): ---
+    IDENTIFIER_UNKNOWN,
+
+    // --- Type errors (TYPE): ---
+    TYPE_INVALID
 } ErrorType;
 
 int error(int line, int error_type, char *error_message);

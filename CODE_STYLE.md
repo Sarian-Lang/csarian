@@ -6,9 +6,7 @@ This document defines the preferred coding style for the **Sarian programming la
 
 ## 1. Indentation
 
-* Use **tabs** for indentation.
-* Avoid mixed indentation.
-* Do not insert space characters for indentation purposes except for alignment within a single line if necessary.
+* Use **2 spaces** for indentation.
 
 ---
 
@@ -26,7 +24,7 @@ else
 	// code
 }
 
-void function_name()
+void FunctionName()
 {
 	// code
 }
@@ -52,22 +50,17 @@ void function_name()
 
 ### 3.2 Functions
 
-* Function names must also use **snake_case**.
+* Use **PascalCase**.
 
-  * ✅ `parse_next_token()`
-  * ✅ `initialize_parser()`
+  * ✅ `ParseNextToken()`
+  * ✅ `InitializeParser()`
 
 ### 3.3 Structs and Enums
 
-* Use **PascalCase** (UpperCamelCase) for struct and enum names:
+* Use **PascalCase** (UpperCamelCase) for struct and enum names also:
 
   * ✅ `TokenType`
   * ✅ `AstNode`
-
-* Enums should also follow PascalCase:
-
-  * ✅ `TokenType`
-  * ✅ `NodeValues`
 
 ---
 
@@ -75,7 +68,7 @@ void function_name()
 
 ### 4.1 Comment Style
 
-* Use **`//` single-line comments** unless the comment is very long (5+ lines) or necessary for documentation/licensing.
+* Use **`//` single-line comments** unless the comment is very long (4-5+ lines) or necessary for documentation/licensing.
 
   * Multi-line comments using `/* ... */` are allowed **only** for licenses, file headers, or very long explanations.
 
@@ -83,7 +76,7 @@ void function_name()
 
 * **Inline comments** (brief, on the same line) should be used sparingly to explain a non-obvious expression.
 
-  * ✅ `value = default_value; // ensure correct baseline`
+  * ✅ `value = default_value; // Ensure correct value.`
 
 * **Above-line comments** should be used to describe the purpose of a block or function when necessary.
 
@@ -100,7 +93,7 @@ void function_name()
 
 ### 4.3 Grammar
 
-* **No periods at the end** for very short comments or labels describing code sections.
+* **No periods at the end** for labels describing code sections.
 
   * ✅ `// Parser`
   * ❌ `// Parser.`
@@ -109,15 +102,15 @@ void function_name()
   * ✅
     
     ```c
-    // This is a very, very, very, very, very, very, very
-    // long comment, you can still see this comment
-    // in small screens
+    // This is a very, very, very, very, very, very, very,
+    // very, very, very, very, very long comment,
+    // splitted into three lines
     ```
     
   * ❌
 
     ```c
-    // This is a very very very very very very very long comment, this comment is so long that in small screens you can't see past right
+    // This is a very very very very very very very very very very very very long comment, you should split it
     ```
     
 * If the comment is long, split it into multiple `//` lines rather than a single long line.
@@ -158,7 +151,7 @@ void function_name()
 
 ## 7. Line Length
 
-* Aim to keep lines under **90-100 characters** when possible for readability.
+* Aim to keep lines under **80-100 characters** when possible for readability.
 * Break long expressions across multiple lines.
 
 ---
@@ -196,4 +189,4 @@ void function_name()
 
 ---
 
-If you have questions or need clarification on any rule, you can ask in the Discord server.
+If you have questions or need clarification on any rule, you can ask in the Discord server or by email.

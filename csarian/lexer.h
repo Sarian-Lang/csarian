@@ -4,8 +4,8 @@
 
 #include "definitions.h"
 
-int lexer(char *line, int lineNum);
+int Lexer(char *code);
 
-void printTokens(Token *tokens, int numTokens);
+void PrintTokens(Token *tokens, int numTokens);
 
 #endif
