@@ -10,6 +10,22 @@ fn sub(a, b)
   return result
 }
 
+fn div(a, b)
+{
+  result = a / b
+  return result
+}
+
+fn mul(a, b)
+{
+  result = a * b
+  return result
+}
+
 printd(sum(5,5))
 
 printd(sub(10,5))
+
+printd(sub(4,2))
+
+printd(div(4,2))
