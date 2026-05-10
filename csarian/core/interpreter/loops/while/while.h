@@ -12,6 +12,6 @@ void InitWhileLoops();
 void TerminateWhileLoops();
 
 void AddWhileLoop(size_t while_start, size_t while_end, Token *comparison_tokens,
-                  size_t comparison_tokens_count);
+                  size_t comparison_tokens_count, size_t line_num);
 
 #endif

@@ -683,7 +683,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
         }
 
         AddWhileLoop(while_block_start, while_block_end, while_comparison_tokens->result_tokens,
-                     while_comparison_tokens->result_tokens_count);
+                     while_comparison_tokens->result_tokens_count, line_num);
         i = while_block_start;
 
         continue;

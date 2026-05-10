@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "csarian/core/error_handling/error.h"
 #include "csarian/definitions.h"
 #include "csarian/runtime/functions/fn.h"
 #include "csarian/utils/debug/debug.h"
@@ -28,13 +29,17 @@ void TerminateWhileLoops()
 }
 
 void AddWhileLoop(size_t while_start, size_t while_end, Token *comparison_tokens,
-                  size_t comparison_tokens_count)
+                  size_t comparison_tokens_count, size_t line_num)
 {
   if (while_loops_count >= while_loops_size)
   {
     size_t new_size = while_loops_size * 2;
 
     While *tmp = realloc(while_loops, sizeof(While) * new_size);
+    if (!tmp)
+    {
+      error(line_num, MEM_REALLOC_FAILED, "Failed to realloc while loops");
+    }
 
     while_loops = tmp;
 
