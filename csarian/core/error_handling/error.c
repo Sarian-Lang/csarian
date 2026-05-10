@@ -2,10 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "csarian/runtime/functions/fn.h"
+#include "csarian/runtime/variables/global_variables/global_vars.h"
+#include "csarian/runtime/labels/label.h"
+#include "csarian/core/interpreter/loops/while/while.h"
+
 #include "error.h"
 
 int error(int line, int error_type, char *error_message)
 {
+  TerminateGlobalVariables();
+  TerminateFunctions();
+  TerminateLabels();
+  TerminateWhileLoops();
+  
   switch (error_type)
   {
     case MEM_MALLOC_FAILED:
