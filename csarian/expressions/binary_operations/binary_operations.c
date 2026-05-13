@@ -116,7 +116,7 @@ static void TranslateFunctions(Token *tokens, size_t *tokens_count, ssize_t curr
 
       Token function_return =
         Interpreter(main_tokens.result_tokens, main_tokens.result_tokens_count, true, index_result,
-                    line_num, functions[index_result].end, main_tokens.result_tokens_count - 1,
+                    functions[index_result].end, main_tokens.result_tokens_count - 1,
                     functions[index_result].start + 1, false);
 
       if (function_return.value == NULL)

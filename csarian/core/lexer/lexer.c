@@ -23,7 +23,7 @@ void InitTokens()
   current_token = 0;
 }
 
-void AddToken(TokenType token_type, char *token_value, TokenPrecedence token_precedence)
+void AddToken(TokenType token_type, char *token_value, TokenPrecedence token_precedence, size_t line)
 {
   if (current_token + 1 >= tokens_len)
   {
@@ -34,7 +34,7 @@ void AddToken(TokenType token_type, char *token_value, TokenPrecedence token_pre
     tokens_len = new_len;
   }
 
-  tokens[current_token] = (Token){token_type, token_value, token_precedence};
+  tokens[current_token] = (Token){token_type, token_value, token_precedence, line};
   current_token++;
 }
 
@@ -54,14 +54,14 @@ ResultTokens Lexer(char *code)
 
     if (i == code_len)  // We reached the end of the code.
     {
-      AddToken(TOKEN_EOF, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_EOF, NULL, NO_PRECEDENCE, current_line);
       break;
     }
 
     else if (current_char == '\n')
     {
       current_line++;
-      AddToken(TOKEN_EOL, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_EOL, NULL, NO_PRECEDENCE, current_line);
     }
 
     // Comments
@@ -69,8 +69,16 @@ ResultTokens Lexer(char *code)
     {
       i += 2;
 
-      while (i < code_len && code[i] != '\n')
+      while (i < code_len)
+      {
+        if (code[i] == '\n')
+        {
+          current_line++;
+          break;
+        }
+
         i++;
+      }
 
       continue;
     }
@@ -92,7 +100,7 @@ ResultTokens Lexer(char *code)
       {
         if (code[j] == '"' || code[j] == '\'')
         {
-          AddToken(TOKEN_STRING, strdup(string_value), NO_PRECEDENCE);
+          AddToken(TOKEN_STRING, strdup(string_value), NO_PRECEDENCE, current_line);
 
           free(string_value);
           string_value = NULL;
@@ -168,42 +176,42 @@ ResultTokens Lexer(char *code)
 
           // Keywords
           if (strcmp(identifier, "and") == 0)
-            AddToken(TOKEN_AND, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_AND, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "or") == 0)
-            AddToken(TOKEN_OR, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_OR, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "if") == 0)
-            AddToken(TOKEN_IF, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_IF, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "else") == 0)
-            AddToken(TOKEN_ELSE, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_ELSE, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "while") == 0)
-            AddToken(TOKEN_WHILE, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_WHILE, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "for") == 0)
-            AddToken(TOKEN_FOR, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_FOR, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "printd") == 0)
-            AddToken(TOKEN_DBG_PRINT, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_DBG_PRINT, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "fn") == 0)
-            AddToken(TOKEN_FN, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_FN, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "import") == 0)
-            AddToken(TOKEN_IMPORT, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_IMPORT, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "return") == 0)
-            AddToken(TOKEN_RETURN, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_RETURN, NULL, NO_PRECEDENCE, current_line);
 
           else if (strcmp(identifier, "goto") == 0)
-            AddToken(TOKEN_GOTO, NULL, NO_PRECEDENCE);
+            AddToken(TOKEN_GOTO, NULL, NO_PRECEDENCE, current_line);
 
           // Not a keyword, adding normal identifier token.
           else
           {
-            AddToken(TOKEN_IDENTIFIER, strdup(identifier), NO_PRECEDENCE);
+            AddToken(TOKEN_IDENTIFIER, strdup(identifier), NO_PRECEDENCE, current_line);
           }
 
           free(identifier);
@@ -291,11 +299,11 @@ ResultTokens Lexer(char *code)
 
           if (!is_float)
           {
-            AddToken(TOKEN_INT_LITERAL, strdup(number), NO_PRECEDENCE);
+            AddToken(TOKEN_INT_LITERAL, strdup(number), NO_PRECEDENCE, current_line);
           }
           else
           {
-            AddToken(TOKEN_FLOAT_LITERAL, strdup(number), NO_PRECEDENCE);
+            AddToken(TOKEN_FLOAT_LITERAL, strdup(number), NO_PRECEDENCE, current_line);
           }
 
           break;
@@ -309,60 +317,60 @@ ResultTokens Lexer(char *code)
     // COMMA
     else if (current_char == ',')
     {
-      AddToken(TOKEN_COMMA, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_COMMA, NULL, NO_PRECEDENCE, current_line);
     }
 
     // COLON
     else if (current_char == ':')
     {
-      AddToken(TOKEN_COLON, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_COLON, NULL, NO_PRECEDENCE, current_line);
     }
 
     // SEMICOLON (EOL)
     else if (current_char == ';')
     {
       current_line++;
-      AddToken(TOKEN_EOL, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_EOL, NULL, NO_PRECEDENCE, current_line);
     }
 
     // PLUS operator
     else if (current_char == '+')
     {
-      AddToken(TOKEN_PLUS, NULL, PLUS_PRECEDENCE);
+      AddToken(TOKEN_PLUS, NULL, PLUS_PRECEDENCE, current_line);
     }
     // MINUS operator
     else if (current_char == '-')
     {
       if (!isdigit(next_char))
       {
-        AddToken(TOKEN_MINUS, NULL, MINUS_PRECEDENCE);
+        AddToken(TOKEN_MINUS, NULL, MINUS_PRECEDENCE, current_line);
       }
     }
     // PERCENT operator
     else if (current_char == '%')
     {
-      AddToken(TOKEN_PERCENT, NULL, PERCENT_PRECEDENCE);
+      AddToken(TOKEN_PERCENT, NULL, PERCENT_PRECEDENCE, current_line);
     }
     // ASTERISK operator
     else if (current_char == '*')
     {
-      AddToken(TOKEN_ASTERISK, NULL, ASTERISK_PRECEDENCE);
+      AddToken(TOKEN_ASTERISK, NULL, ASTERISK_PRECEDENCE, current_line);
     }
     // SLASH operator
     else if (current_char == '/' && next_char != '/')
     {
-      AddToken(TOKEN_SLASH, NULL, SLASH_PRECEDENCE);
+      AddToken(TOKEN_SLASH, NULL, SLASH_PRECEDENCE, current_line);
     }
     // ASSIGNMENT / EQUAL operator
     else if (current_char == '=')
     {
       if (next_char != '=')
       {
-        AddToken(TOKEN_ASSIGNMENT, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_ASSIGNMENT, NULL, NO_PRECEDENCE, current_line);
       }
       else
       {
-        AddToken(TOKEN_EQUAL, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_EQUAL, NULL, NO_PRECEDENCE, current_line);
         i++;
       }
     }
@@ -371,11 +379,11 @@ ResultTokens Lexer(char *code)
     {
       if (next_char != '=')
       {
-        AddToken(TOKEN_GREATER, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_GREATER, NULL, NO_PRECEDENCE, current_line);
       }
       else
       {
-        AddToken(TOKEN_GREATER_EQUAL, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_GREATER_EQUAL, NULL, NO_PRECEDENCE, current_line);
         i++;
       }
     }
@@ -384,11 +392,11 @@ ResultTokens Lexer(char *code)
     {
       if (next_char != '=')
       {
-        AddToken(TOKEN_LESS, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_LESS, NULL, NO_PRECEDENCE, current_line);
       }
       else
       {
-        AddToken(TOKEN_LESS_EQUAL, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_LESS_EQUAL, NULL, NO_PRECEDENCE, current_line);
         i++;
       }
     }
@@ -397,11 +405,11 @@ ResultTokens Lexer(char *code)
     {
       if (next_char != '=')
       {
-        AddToken(TOKEN_EXCLAMATION, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_EXCLAMATION, NULL, NO_PRECEDENCE, current_line);
       }
       else
       {
-        AddToken(TOKEN_NOT_EQUAL, NULL, NO_PRECEDENCE);
+        AddToken(TOKEN_NOT_EQUAL, NULL, NO_PRECEDENCE, current_line);
         i++;
       }
     }
@@ -409,21 +417,21 @@ ResultTokens Lexer(char *code)
     // Parents
     else if (current_char == '(')
     {
-      AddToken(TOKEN_LPARENT, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_LPARENT, NULL, NO_PRECEDENCE, current_line);
     }
     else if (current_char == ')')
     {
-      AddToken(TOKEN_RPARENT, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_RPARENT, NULL, NO_PRECEDENCE, current_line);
     }
 
     // Braces
     else if (current_char == '{')
     {
-      AddToken(TOKEN_LBRACE, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_LBRACE, NULL, NO_PRECEDENCE, current_line);
     }
     else if (current_char == '}')
     {
-      AddToken(TOKEN_RBRACE, NULL, NO_PRECEDENCE);
+      AddToken(TOKEN_RBRACE, NULL, NO_PRECEDENCE, current_line);
     }
 
     else if (current_char == ' ')

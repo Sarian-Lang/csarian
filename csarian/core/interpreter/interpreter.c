@@ -20,7 +20,7 @@
 #include "import/import.h"
 #include "loops/while/while.h"
 
-static void IgnoreElseBlock(Token *tokens, size_t tokens_count, size_t *i, size_t *line_num)
+static void IgnoreElseBlock(Token *tokens, size_t tokens_count, size_t *i)
 {
   bool found_block = false;
   size_t depth = 0;
@@ -28,11 +28,6 @@ static void IgnoreElseBlock(Token *tokens, size_t tokens_count, size_t *i, size_
 
   for (size_t j = *i + 1; j < tokens_count; j++)
   {
-    if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-    {
-      line_num++;
-    }
-
     if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
     {
       if (found_block)
@@ -65,25 +60,24 @@ static void IgnoreElseBlock(Token *tokens, size_t tokens_count, size_t *i, size_
   }
   else
   {
-    error(*line_num, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces in else block.");
+    error(PTR_I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces in else block.");
   }
 }
 
-static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t current_function,
-                     size_t *line_num)
+static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t current_function)
 {
   if (PTR_I_NEXT_TOKEN_1.type != TOKEN_IDENTIFIER)
   {
-    error(*line_num, SYNTAX_INVALID, "Expected function name after 'fn'.");
+    error(PTR_I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected function name after 'fn'.");
   }
 
   if (*i + 2 >= tokens_count || PTR_I_NEXT_TOKEN_2.type != TOKEN_LPARENT)
   {
-    error(*line_num, SYNTAX_INVALID, "Expected '('.");
+    error(PTR_I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected '('.");
   }
 
   ResultTokens *parent_tokens =
-    GetParentTokens(&PTR_I_NEXT_TOKEN_2, tokens_count - (*i + 2), *line_num);
+    GetParentTokens(&PTR_I_NEXT_TOKEN_2, tokens_count - (*i + 2), PTR_I_NEXT_TOKEN_2.line);
 
   ssize_t fn_block_start = -1;
   ssize_t fn_block_end = -1;
@@ -92,14 +86,9 @@ static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t curr
 
   for (size_t j = *i + 2 + parent_tokens->result_tokens_count + 1; j < tokens_count; j++)
   {
-    if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-    {
-      line_num++;
-    }
-
     if (J_CURRENT_TOKEN.type == TOKEN_FN)
     {
-      error(*line_num, SYNTAX_ILLEGAL_FUNCTION, "Cannot declare function inside another function.");
+      error(J_CURRENT_TOKEN.line, SYNTAX_ILLEGAL_FUNCTION, "Cannot declare function inside another function.");
     }
 
     if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
@@ -125,7 +114,7 @@ static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t curr
   }
 
   if (fn_block_end == -1)
-    error(*line_num, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside function.");
+    error(PTR_I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside function.");
 
   AddFunction(PTR_I_NEXT_TOKEN_1.value, 0, fn_block_start, fn_block_end);
 
@@ -153,7 +142,7 @@ static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t curr
 
       else
       {
-        error(*line_num, SYNTAX_INVALID,
+        error(parent_tokens->result_tokens[j].line, SYNTAX_INVALID,
               "Only identifiers and commas are allowed in function arguments.");
       }
     }
@@ -163,8 +152,7 @@ static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t curr
 }
 
 static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssize_t *block_end,
-                             bool *in_function, ssize_t *original_pos, ssize_t *current_function,
-                             size_t line_num)
+                             bool *in_function, ssize_t *original_pos, ssize_t *current_function)
 {
   // Search for functions
   ssize_t result = SearchFunction(PTR_I_CURRENT_TOKEN.value);
@@ -177,7 +165,7 @@ static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssiz
           GetGlobalVariable(PTR_I_CURRENT_TOKEN.value).variable_index == -1 &&
           PTR_I_NEXT_TOKEN_1.type != TOKEN_ASSIGNMENT && PTR_I_NEXT_TOKEN_1.type != TOKEN_COLON)
       {
-        error(line_num, IDENTIFIER_UNKNOWN, "Unknown identifier.");
+        error(PTR_I_CURRENT_TOKEN.line, IDENTIFIER_UNKNOWN, "Unknown identifier.");
       }
     }
 
@@ -186,7 +174,7 @@ static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssiz
       if (GetGlobalVariable(PTR_I_CURRENT_TOKEN.value).variable_index == -1 &&
           PTR_I_NEXT_TOKEN_1.type != TOKEN_ASSIGNMENT && PTR_I_NEXT_TOKEN_1.type != TOKEN_COLON)
       {
-        error(line_num, IDENTIFIER_UNKNOWN, "Unknown identifier.");
+        error(PTR_I_CURRENT_TOKEN.line, IDENTIFIER_UNKNOWN, "Unknown identifier.");
       }
     }
 
@@ -207,21 +195,21 @@ static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssiz
   // Arguments
   if (PTR_I_NEXT_TOKEN_1.type != TOKEN_LPARENT)
   {
-    error(line_num, SYNTAX_INVALID, "Expected '(' after function call.");
+    error(PTR_I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected '(' after function call.");
   }
 
-  ResultTokens parent_tokens = *GetParentTokens(&tokens[*i + 1], tokens_count, line_num);
+  ResultTokens parent_tokens = *GetParentTokens(&tokens[*i + 1], tokens_count, PTR_I_NEXT_TOKEN_1.line);
 
   ResultVariables *arguments = GetFunctionArguments(
-    parent_tokens.result_tokens, parent_tokens.result_tokens_count, *current_function, line_num);
+    parent_tokens.result_tokens, parent_tokens.result_tokens_count, *current_function, PTR_I_NEXT_TOKEN_1.line);
 
   if (arguments->result_variables_count != functions[result].arguments)
   {
     if (arguments->result_variables_count > functions[result].arguments)
-      error(line_num, TYPE_INVALID_ARGUMENTS, "Expected less arguments for function call.");
+      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS, "Expected less arguments for function call.");
 
     if (arguments->result_variables_count < functions[result].arguments)
-      error(line_num, TYPE_INVALID_ARGUMENTS, "Expected more arguments for function call.");
+      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS, "Expected more arguments for function call.");
   }
 
   for (size_t j = 0; j < functions[result].arguments; j++)
@@ -236,13 +224,12 @@ static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssiz
   *current_function = result;
 }
 
-static void HandleDebugPrint(Token *tokens, size_t tokens_count, size_t i, ssize_t current_function,
-                             size_t line_num)
+static void HandleDebugPrint(Token *tokens, size_t tokens_count, size_t i, ssize_t current_function)
 {
-  ResultTokens print_tokens = *GetParentTokens(&tokens[i], tokens_count, line_num);
+  ResultTokens print_tokens = *GetParentTokens(&tokens[i], tokens_count, I_CURRENT_TOKEN.line);
 
   Token result_token = BinaryOperation(print_tokens.result_tokens, print_tokens.result_tokens_count,
-                                       current_function, line_num);
+                                       current_function, I_CURRENT_TOKEN.line);
 
   if (result_token.type != TOKEN_NULL)
   {
@@ -255,16 +242,16 @@ static void HandleDebugPrint(Token *tokens, size_t tokens_count, size_t i, ssize
 }
 
 static void HandleAssignment(Token *tokens, size_t tokens_count, size_t *i,
-                             ssize_t current_function, bool in_function, size_t line_num)
+                             ssize_t current_function, bool in_function)
 {
   if (*i == 0 || PTR_I_NEXT_TOKEN_1.type == TOKEN_EOF)
   {
-    error(line_num, SYNTAX_INVALID, "Incomplete assignment (=).");
+    error(PTR_I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Incomplete assignment (=).");
   }
 
   if (PTR_I_PREVIOUS_TOKEN.type != TOKEN_IDENTIFIER)
   {
-    error(line_num, SYNTAX_INVALID, "Expected identifier before '='.");
+    error(PTR_I_PREVIOUS_TOKEN.line, SYNTAX_INVALID, "Expected identifier before '='.");
   }
 
   ssize_t global_variable_index = -1;
@@ -279,17 +266,17 @@ static void HandleAssignment(Token *tokens, size_t tokens_count, size_t *i,
   }
 
   ResultTokens result_tokens =
-    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), line_num);
+    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
 
   Token binary_operation_result = BinaryOperation(
-    result_tokens.result_tokens, result_tokens.result_tokens_count, current_function, line_num);
+    result_tokens.result_tokens, result_tokens.result_tokens_count, current_function, PTR_I_NEXT_TOKEN_1.line);
 
   VariableType variable_type =
-    TokenTypeToVariableType(binary_operation_result, current_function, line_num);
+    TokenTypeToVariableType(binary_operation_result, current_function, PTR_I_NEXT_TOKEN_1.line);
 
   if (variable_type == INVALID)
   {
-    error(line_num, TYPE_INVALID, "Invalid variable value.");
+    error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID, "Invalid variable value.");
   }
 
   if (in_function)
@@ -332,7 +319,7 @@ static void HandleAssignment(Token *tokens, size_t tokens_count, size_t *i,
   }
 }
 
-static void HandleLabel(Token *tokens, size_t i, size_t line_num)
+static void HandleLabel(Token *tokens, size_t i)
 {
   if (i != 0 && I_PREVIOUS_TOKEN.type == TOKEN_IDENTIFIER)
   {
@@ -340,33 +327,33 @@ static void HandleLabel(Token *tokens, size_t i, size_t line_num)
   }
   else
   {
-    error(line_num, SYNTAX_INVALID, "Invalid or missing label name.");
+    error(I_CURRENT_TOKEN.line, SYNTAX_INVALID, "Invalid or missing label name.");
   }
 }
 
 static void HandleReturn(Token *tokens, size_t tokens_count, size_t *i, ssize_t *original_pos,
                          bool *in_function, ssize_t *current_function, ssize_t *block_end,
-                         Token *Return, size_t line_num)
+                         Token *Return)
 {
   if (!in_function)
   {
-    error(line_num, SYNTAX_INVALID, "Cannot use return outside of functions.");
+    error(PTR_I_CURRENT_TOKEN.line, SYNTAX_INVALID, "Cannot use return outside of functions.");
   }
 
   if (PTR_I_NEXT_TOKEN_1.type == TOKEN_EOL || PTR_I_NEXT_TOKEN_1.type == TOKEN_EOF)
   {
-    error(line_num, SYNTAX_INCOMPLETE_EXPRESSION, "Incomplete return at function.");
+    error(PTR_I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_EXPRESSION, "Incomplete return at function.");
   }
 
   ResultTokens return_tokens =
-    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), line_num);
+    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
 
   Token result = BinaryOperation(return_tokens.result_tokens, return_tokens.result_tokens_count,
-                                 *current_function, line_num);
+                                 *current_function, PTR_I_NEXT_TOKEN_1.line);
 
   if (result.type == TOKEN_NULL)
   {
-    error(line_num, TYPE_INVALID, "Return value cannot be null.");
+    error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID, "Return value cannot be null.");
   }
 
   Return->value = result.value;
@@ -384,7 +371,7 @@ static void HandleReturn(Token *tokens, size_t tokens_count, size_t *i, ssize_t 
 }
 
 Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t current_function,
-                  size_t line_num, ssize_t block_end, ssize_t original_pos, size_t i,
+                  ssize_t block_end, ssize_t original_pos, size_t i,
                   bool main_execution)
 {
   Token Return;
@@ -417,14 +404,6 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
       break;
     }
 
-    if (I_CURRENT_TOKEN.type == TOKEN_EOL)
-    {
-      if (!in_function)
-      {
-        line_num++;
-      }
-    }
-
     if (in_function == true && i > block_end)
     {
       TerminateLocalVariables(current_function);
@@ -444,7 +423,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
       if (ParseComparison(
             while_loops[while_loops_count - 1].while_comparison_tokens.result_tokens,
             while_loops[while_loops_count - 1].while_comparison_tokens.result_tokens_count,
-            current_function, line_num))
+            current_function, tokens[while_loops[while_loops_count - 1].while_block_start].line))
       {
         i = while_loops[while_loops_count - 1].while_block_start;
       }
@@ -461,48 +440,48 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
     // execution.
     if (I_CURRENT_TOKEN.type == TOKEN_ELSE)
     {
-      IgnoreElseBlock(tokens, tokens_count, &i, &line_num);
+      IgnoreElseBlock(tokens, tokens_count, &i);
       continue;
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_FN)
     {
-      HandleFn(tokens, tokens_count, &i, current_function, &line_num);
+      HandleFn(tokens, tokens_count, &i, current_function);
       continue;
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_IDENTIFIER)
     {
       HandleIdentifier(tokens, tokens_count, &i, &block_end, &in_function, &original_pos,
-                       &current_function, line_num);
+                       &current_function);
       continue;
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_ASSIGNMENT)
     {
-      HandleAssignment(tokens, tokens_count, &i, current_function, in_function, line_num);
+      HandleAssignment(tokens, tokens_count, &i, current_function, in_function);
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_DBG_PRINT)
     {
-      HandleDebugPrint(tokens, tokens_count, i, current_function, line_num);
+      HandleDebugPrint(tokens, tokens_count, i, current_function);
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_COLON)
     {
-      HandleLabel(tokens, i, line_num);
+      HandleLabel(tokens, i);
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_RETURN)
     {
       HandleReturn(tokens, tokens_count, &i, &original_pos, &in_function, &current_function,
-                   &block_end, &Return, line_num);
+                   &block_end, &Return);
       continue;
     }
 
     if (I_CURRENT_TOKEN.type == TOKEN_IMPORT)
     {
-      Import(tokens, &tokens_count, &i, line_num);
+      Import(tokens, &tokens_count, &i);
       continue;
     }
 
@@ -511,14 +490,14 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
     {
       if (I_NEXT_TOKEN_1.type != TOKEN_LPARENT)
       {
-        error(line_num, SYNTAX_INVALID, "Expected '(' after if statement.");
+        error(I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected '(' after if statement.");
       }
 
       ResultTokens *parent_tokens =
-        GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), line_num);
+        GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), I_NEXT_TOKEN_1.line);
 
       bool result = ParseComparison(parent_tokens->result_tokens,
-                                    parent_tokens->result_tokens_count, current_function, line_num);
+                                    parent_tokens->result_tokens_count, current_function, I_NEXT_TOKEN_1.line);
 
       if (result)
       {
@@ -527,7 +506,9 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
         for (size_t j = i + 1 + parent_tokens->result_tokens_count + 1; j < tokens_count; j++)
         {
           if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-            line_num++;
+          {
+            // Ignore
+          }
 
           else if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
           {
@@ -540,7 +521,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
           else
           {
-            error(line_num, SYNTAX_INVALID, "Expected '{'.");
+            error(J_CURRENT_TOKEN.line, SYNTAX_INVALID, "Expected '{'.");
           }
         }
 
@@ -556,9 +537,6 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         for (size_t j = i + 1 + parent_tokens->result_tokens_count + 1; j < tokens_count; j++)
         {
-          if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-            line_num++;
-
           if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
           {
             if (found_block == true)
@@ -581,7 +559,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         if (if_block_end == -1)
         {
-          error(line_num, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside if block.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside if block.");
         }
 
         ssize_t found_else = -1;
@@ -590,7 +568,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
         {
           if (J_CURRENT_TOKEN.type == TOKEN_EOL)
           {
-            line_num++;
+            // Ignore
           }
 
           else if (J_CURRENT_TOKEN.type == TOKEN_ELSE)
@@ -622,18 +600,18 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
     {
       if (I_NEXT_TOKEN_1.type != TOKEN_LPARENT)
       {
-        error(line_num, SYNTAX_INVALID, "Expected '(' after while statement.");
+        error(I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected '(' after while statement.");
       }
 
       ssize_t while_block_start;
       ssize_t while_block_end;
 
       ResultTokens *while_comparison_tokens =
-        GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), line_num);
+        GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), I_NEXT_TOKEN_1.line);
 
       bool result =
         ParseComparison(while_comparison_tokens->result_tokens,
-                        while_comparison_tokens->result_tokens_count, current_function, line_num);
+                        while_comparison_tokens->result_tokens_count, current_function, I_NEXT_TOKEN_1.line);
 
       if (result)
       {
@@ -647,7 +625,9 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
              j++)
         {
           if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-            line_num++;
+          {
+            // Ignore
+          }
 
           else if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
           {
@@ -674,16 +654,16 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         if (while_block_start == -1)
         {
-          error(line_num, SYNTAX_INVALID, "Expected '{' at while loop.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INVALID, "Expected '{' at while loop.");
         }
 
         if (while_block_end == -1)
         {
-          error(line_num, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces at while block.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces at while block.");
         }
 
         AddWhileLoop(while_block_start, while_block_end, while_comparison_tokens->result_tokens,
-                     while_comparison_tokens->result_tokens_count, line_num);
+                     while_comparison_tokens->result_tokens_count, I_CURRENT_TOKEN.line);
         i = while_block_start;
 
         continue;
@@ -698,9 +678,6 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
         for (size_t j = i + 1 + while_comparison_tokens->result_tokens_count + 1; j < tokens_count;
              j++)
         {
-          if (J_CURRENT_TOKEN.type == TOKEN_EOL)
-            line_num++;
-
           if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
           {
             if (found_block == true)
@@ -723,7 +700,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         if (while_block_end == -1)
         {
-          error(line_num, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside while block.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside while block.");
         }
 
         ssize_t found_else = -1;
@@ -732,7 +709,7 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
         {
           if (J_CURRENT_TOKEN.type == TOKEN_EOL)
           {
-            line_num++;
+            // Ignore
           }
 
           else if (J_CURRENT_TOKEN.type == TOKEN_ELSE)
@@ -764,14 +741,14 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
     {
       if (I_NEXT_TOKEN_1.type != TOKEN_IDENTIFIER)
       {
-        error(line_num, SYNTAX_INVALID, "Missing label name for 'goto'.");
+        error(I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Missing label name for 'goto'.");
       }
 
       ssize_t label_index = GetLabel(I_NEXT_TOKEN_1.value);
 
       if (label_index == -1)
       {
-        error(line_num, SYNTAX_INVALID, "Unknown 'goto' label.");
+        error(I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Unknown 'goto' label.");
       }
 
       i = labels[label_index].start;

@@ -8,7 +8,7 @@
 #include "csarian/definitions.h"
 #include "csarian/utils/token_utils/token_utils.h"
 
-void Import(Token *tokens, size_t *tokens_count, size_t *i, size_t line_num)
+void Import(Token *tokens, size_t *tokens_count, size_t *i)
 {
   if (PTR_I_NEXT_TOKEN_1.type == TOKEN_STRING)
   {
@@ -39,7 +39,7 @@ void Import(Token *tokens, size_t *tokens_count, size_t *i, size_t line_num)
     if (!code)
     {
       fclose(file);
-      error(line_num, MEM_MALLOC_FAILED, "Failed to malloc() code.");
+      error(PTR_I_NEXT_TOKEN_1.line, MEM_MALLOC_FAILED, "Failed to malloc() code.");
     }
 
     size_t bytes_read = fread(code, 1, (size_t)filesize, file);
@@ -72,7 +72,7 @@ void Import(Token *tokens, size_t *tokens_count, size_t *i, size_t line_num)
     if (!tokens)
     {
       free(code);
-      error(line_num, MEM_REALLOC_FAILED, "Failed to realloc tokens array");
+      error(PTR_I_NEXT_TOKEN_1.line, MEM_REALLOC_FAILED, "Failed to realloc tokens array");
     }
 
     // Move the subsequent tokens forward

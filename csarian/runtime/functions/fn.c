@@ -69,7 +69,8 @@ ResultVariables *GetFunctionArguments(Token *tokens, size_t tokens_count, ssize_
   size_t result_size = 8;
   size_t result_count = 0;
 
-  ResultVariables *result;
+  ResultVariables *result = malloc(sizeof(ResultVariables));
+
   result->result_variables = calloc(result_size, sizeof(Variable));
   if (!result->result_variables)
   {

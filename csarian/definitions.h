@@ -84,6 +84,8 @@ typedef struct
   TokenType type;
   char *value;
   TokenPrecedence precedence;
+
+  size_t line;
 } Token;
 
 // Function struct

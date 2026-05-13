@@ -4,6 +4,6 @@
 
 #include "csarian/definitions.h"
 
-void Import(Token *tokens, size_t *tokens_count, size_t *i, size_t line_num);
+void Import(Token *tokens, size_t *tokens_count, size_t *i);
 
 #endif

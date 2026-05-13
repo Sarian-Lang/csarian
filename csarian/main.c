@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
   fclose(file);
 
   main_tokens = Lexer(code);
-  Interpreter(main_tokens.result_tokens, main_tokens.result_tokens_count, false, -1, 1, -1, -1, 0,
+  Interpreter(main_tokens.result_tokens, main_tokens.result_tokens_count, false, -1, -1, -1, 0,
               true);
 
   free(code);
