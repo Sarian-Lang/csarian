@@ -88,7 +88,8 @@ static void HandleFn(Token *tokens, size_t tokens_count, size_t *i, ssize_t curr
   {
     if (J_CURRENT_TOKEN.type == TOKEN_FN)
     {
-      error(J_CURRENT_TOKEN.line, SYNTAX_ILLEGAL_FUNCTION, "Cannot declare function inside another function.");
+      error(J_CURRENT_TOKEN.line, SYNTAX_ILLEGAL_FUNCTION,
+            "Cannot declare function inside another function.");
     }
 
     if (J_CURRENT_TOKEN.type == TOKEN_LBRACE)
@@ -198,18 +199,22 @@ static void HandleIdentifier(Token *tokens, size_t tokens_count, size_t *i, ssiz
     error(PTR_I_NEXT_TOKEN_1.line, SYNTAX_INVALID, "Expected '(' after function call.");
   }
 
-  ResultTokens parent_tokens = *GetParentTokens(&tokens[*i + 1], tokens_count, PTR_I_NEXT_TOKEN_1.line);
+  ResultTokens parent_tokens =
+    *GetParentTokens(&tokens[*i + 1], tokens_count, PTR_I_NEXT_TOKEN_1.line);
 
-  ResultVariables *arguments = GetFunctionArguments(
-    parent_tokens.result_tokens, parent_tokens.result_tokens_count, *current_function, PTR_I_NEXT_TOKEN_1.line);
+  ResultVariables *arguments =
+    GetFunctionArguments(parent_tokens.result_tokens, parent_tokens.result_tokens_count,
+                         *current_function, PTR_I_NEXT_TOKEN_1.line);
 
   if (arguments->result_variables_count != functions[result].arguments)
   {
     if (arguments->result_variables_count > functions[result].arguments)
-      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS, "Expected less arguments for function call.");
+      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS,
+            "Expected less arguments for function call.");
 
     if (arguments->result_variables_count < functions[result].arguments)
-      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS, "Expected more arguments for function call.");
+      error(PTR_I_NEXT_TOKEN_1.line, TYPE_INVALID_ARGUMENTS,
+            "Expected more arguments for function call.");
   }
 
   for (size_t j = 0; j < functions[result].arguments; j++)
@@ -265,11 +270,12 @@ static void HandleAssignment(Token *tokens, size_t tokens_count, size_t *i,
       GetLocalVariable(current_function, PTR_I_PREVIOUS_TOKEN.value).variable_index;
   }
 
-  ResultTokens result_tokens =
-    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
+  ResultTokens result_tokens = *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1,
+                                                tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
 
-  Token binary_operation_result = BinaryOperation(
-    result_tokens.result_tokens, result_tokens.result_tokens_count, current_function, PTR_I_NEXT_TOKEN_1.line);
+  Token binary_operation_result =
+    BinaryOperation(result_tokens.result_tokens, result_tokens.result_tokens_count,
+                    current_function, PTR_I_NEXT_TOKEN_1.line);
 
   VariableType variable_type =
     TokenTypeToVariableType(binary_operation_result, current_function, PTR_I_NEXT_TOKEN_1.line);
@@ -345,8 +351,8 @@ static void HandleReturn(Token *tokens, size_t tokens_count, size_t *i, ssize_t 
     error(PTR_I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_EXPRESSION, "Incomplete return at function.");
   }
 
-  ResultTokens return_tokens =
-    *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1, tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
+  ResultTokens return_tokens = *GetTokensUntilX(TOKEN_EOL, &PTR_I_NEXT_TOKEN_1,
+                                                tokens_count - (*i + 1), PTR_I_NEXT_TOKEN_1.line);
 
   Token result = BinaryOperation(return_tokens.result_tokens, return_tokens.result_tokens_count,
                                  *current_function, PTR_I_NEXT_TOKEN_1.line);
@@ -371,8 +377,7 @@ static void HandleReturn(Token *tokens, size_t tokens_count, size_t *i, ssize_t 
 }
 
 Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t current_function,
-                  ssize_t block_end, ssize_t original_pos, size_t i,
-                  bool main_execution)
+                  ssize_t block_end, ssize_t original_pos, size_t i, bool main_execution)
 {
   Token Return;
   Return.value = NULL;
@@ -496,8 +501,9 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
       ResultTokens *parent_tokens =
         GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), I_NEXT_TOKEN_1.line);
 
-      bool result = ParseComparison(parent_tokens->result_tokens,
-                                    parent_tokens->result_tokens_count, current_function, I_NEXT_TOKEN_1.line);
+      bool result =
+        ParseComparison(parent_tokens->result_tokens, parent_tokens->result_tokens_count,
+                        current_function, I_NEXT_TOKEN_1.line);
 
       if (result)
       {
@@ -559,7 +565,8 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         if (if_block_end == -1)
         {
-          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside if block.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE,
+                "Incomplete braces inside if block.");
         }
 
         ssize_t found_else = -1;
@@ -609,9 +616,9 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
       ResultTokens *while_comparison_tokens =
         GetParentTokens(&tokens[i + 1], tokens_count - (i + 1), I_NEXT_TOKEN_1.line);
 
-      bool result =
-        ParseComparison(while_comparison_tokens->result_tokens,
-                        while_comparison_tokens->result_tokens_count, current_function, I_NEXT_TOKEN_1.line);
+      bool result = ParseComparison(while_comparison_tokens->result_tokens,
+                                    while_comparison_tokens->result_tokens_count, current_function,
+                                    I_NEXT_TOKEN_1.line);
 
       if (result)
       {
@@ -700,7 +707,8 @@ Token Interpreter(Token *tokens, size_t tokens_count, bool in_function, ssize_t 
 
         if (while_block_end == -1)
         {
-          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE, "Incomplete braces inside while block.");
+          error(I_CURRENT_TOKEN.line, SYNTAX_INCOMPLETE_BRACE,
+                "Incomplete braces inside while block.");
         }
 
         ssize_t found_else = -1;

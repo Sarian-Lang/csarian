@@ -23,7 +23,8 @@ void InitTokens()
   current_token = 0;
 }
 
-void AddToken(TokenType token_type, char *token_value, TokenPrecedence token_precedence, size_t line)
+void AddToken(TokenType token_type, char *token_value, TokenPrecedence token_precedence,
+              size_t line)
 {
   if (current_token + 1 >= tokens_len)
   {
