@@ -8,9 +8,9 @@
 
 ## 📌 General Information
 
-- **Status:** Working in 0.1 version
+- **Status:** Working in version 0.1.
 - **Documentation:** Not yet available.
-- **License:** MIT License
+- **Website:** Not yet available.
 
 ---
 
