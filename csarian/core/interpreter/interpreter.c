@@ -39,6 +39,16 @@ static void IgnoreElseBlock(Token *tokens, size_t tokens_count, size_t *i)
         found_block = true;
       }
     }
+    else
+    {
+      if (!found_block)
+      {
+        if (J_CURRENT_TOKEN.type != TOKEN_EOL)
+        {
+          error(J_CURRENT_TOKEN.line, SYNTAX_INVALID, "Expected '{' after 'else'.");
+        }
+      }
+    }
 
     if (J_CURRENT_TOKEN.type == TOKEN_RBRACE)
     {

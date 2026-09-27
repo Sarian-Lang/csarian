@@ -12,6 +12,7 @@ typedef enum
   INTEGER,
   FLOAT,
   STRING,
+  BOOLEAN,
   INVALID
 } VariableType;
 
@@ -62,6 +63,8 @@ typedef enum
   TOKEN_IMPORT,
   TOKEN_RETURN,
   TOKEN_GOTO,
+  TOKEN_TRUE,
+  TOKEN_FALSE,
   TOKEN_NULL
 } TokenType;
 
@@ -136,7 +139,7 @@ typedef struct
 
 #define IS_VALID_BINARY_OPERAND(t)                                                  \
   ((t) == TOKEN_INT_LITERAL || (t) == TOKEN_FLOAT_LITERAL || (t) == TOKEN_STRING || \
-   (t) == TOKEN_IDENTIFIER)
+   (t) == TOKEN_IDENTIFIER || (t) == TOKEN_TRUE || (t) == TOKEN_FALSE)
 
 #define IS_COMPARISON_TOKEN(t)                                             \
   ((t) == TOKEN_EQUAL || (t) == TOKEN_NOT_EQUAL || (t) == TOKEN_GREATER || \

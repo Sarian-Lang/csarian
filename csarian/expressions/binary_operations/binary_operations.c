@@ -25,6 +25,7 @@ static void ReturnInput(Token *tokens, ssize_t current_function, Token *result, 
     error(line_num, SYNTAX_INCOMPLETE_EXPRESSION, "Incomplete binary operation.");
   }
 
+  // Variables
   if (tokens[0].type == TOKEN_IDENTIFIER)
   {
     GetGlobalVariableResult global_variable = GetGlobalVariable(tokens[0].value);
@@ -56,6 +57,7 @@ static void ReturnInput(Token *tokens, ssize_t current_function, Token *result, 
       }
     }
 
+    // Others
     else
     {
       if (global_variable.variable_index != -1)
@@ -71,6 +73,21 @@ static void ReturnInput(Token *tokens, ssize_t current_function, Token *result, 
     }
   }
 
+  // Booleans
+  else if (tokens[0].type == TOKEN_TRUE)
+  {
+    result->type = TOKEN_INT_LITERAL;
+    result->value = "1";
+    result->precedence = NO_PRECEDENCE;
+  }
+  else if (tokens[0].type == TOKEN_FALSE)
+  {
+    result->type = TOKEN_INT_LITERAL;
+    result->value = "0";
+    result->precedence = NO_PRECEDENCE;
+  }
+
+  // Others
   else
   {
     result->type = tokens[0].type;
@@ -208,6 +225,18 @@ static Token Operation(Token *tokens, ssize_t current_function, size_t line_num)
     Token result = TranslateVariable(OPERAND_B, current_function, line_num);
     OPERAND_B.type = result.type;
     OPERAND_B.value = result.value;
+  }
+
+  // Translate Booleans
+  if (OPERAND_A.type == TOKEN_TRUE)
+  {
+    OPERAND_A.type = TOKEN_INT_LITERAL;
+    OPERAND_A.value = "1";
+  }
+  if (OPERAND_A.type == TOKEN_FALSE)
+  {
+    OPERAND_A.type = TOKEN_INT_LITERAL;
+    OPERAND_A.value = "0";
   }
 
   // String operations

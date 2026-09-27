@@ -58,6 +58,12 @@ VariableType TokenTypeToVariableType(Token token, ssize_t current_function, size
       }
 
       break;
+    case TOKEN_TRUE:
+      result = BOOLEAN;
+      break;
+    case TOKEN_FALSE:
+      result = BOOLEAN;
+      break;
 
     default:
       result = INVALID;
