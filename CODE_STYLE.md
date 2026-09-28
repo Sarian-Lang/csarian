@@ -1,10 +1,10 @@
 # Sarian Code Style Guidelines
 
-This document defines the preferred coding style for the **Sarian programming language**. All contributors are expected to follow these conventions.
+This document defines the preferred coding style for the Sarian programming language. All contributors are expected to follow these conventions.
 
 ---
 
-## 1. Automatic Formatting
+## 1. Formatting and cleaning
 
 * After finishing your code, always run:
 
@@ -12,11 +12,11 @@ This document defines the preferred coding style for the **Sarian programming la
   make format
   ```
 
-  This automatically formats your code, including **indentation, brace placement, and other formatting rules.**
+  This automatically formats your code, including indentation, brace placement, and other formatting rules.
 
-* Anything not covered by the automatic formatter is explained in the following sections.
+* Anything not covered by the automatic formatter is explained in the following sections. Make sure **`clang-format-17`** is installed on your system.
 
-* Make sure **`clang-format-17`** is installed on your system.
+* Make sure to delete any compiled file before doing a pull request as well.
 
 ---
 
@@ -28,7 +28,7 @@ This document defines the preferred coding style for the **Sarian programming la
 
   * ❌ `int TK;`
   * ✅ `int TOKEN;`
-  * ❌ `char *strfn;`
+  * ❌ `char *sf;`
   * ✅ `char *string_function;`
 
 * Use **snake_case** for variable names:
